@@ -48,6 +48,13 @@ async def run_command(command: str, device: str | None, provider: str, model: st
             return
         if not model:
             model = "gpt-4o-mini"
+    elif provider.lower() == 'deepseek':
+        api_key = os.environ.get('DEEPSEEK_API_KEY')
+        if not api_key:
+            console.print("[bold red]Error:[/] DEEPSEEK_API_KEY environment variable not set")
+            return
+        if not model:
+            model = "deepseek-chat"
     elif provider.lower() == 'anthropic':
         api_key = os.environ.get('ANTHROPIC_API_KEY')
         if not api_key:

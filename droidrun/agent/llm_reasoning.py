@@ -102,6 +102,25 @@ class LLMReasoner:
                 base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
             )
             logger.info(f"Initialized Gemini client with model {self.model_name}")
+
+        elif self.llm_provider == "deepseek":
+            if not OPENAI_AVAILABLE:
+                raise ImportError("OpenAI package not installed. Install with 'pip install openai'")
+            
+            # Set default model if not specified
+            self.model_name = model_name or "deepseek-chat"
+            
+            # Get API key from env var if not provided
+            self.api_key = api_key or os.environ.get("DEEPSEEK_API_KEY")
+            if not self.api_key:
+                raise ValueError("DeepSeek API key not provided and not found in environment (DEEPSEEK_API_KEY)")
+            
+            # Initialize client with Gemini configuration
+            self.client = OpenAI(
+                api_key=self.api_key,
+                base_url="https://api.deepseek.com"
+            )
+            logger.info(f"Initialized DeepSeek client with model {self.model_name}")
             
         elif self.llm_provider == "openai":
             if not OPENAI_AVAILABLE:
@@ -197,7 +216,7 @@ class LLMReasoner:
         
         try:
             # Call the LLM based on provider
-            if self.llm_provider in ["openai", "gemini"]:  # Handle both OpenAI and Gemini with OpenAI client
+            if self.llm_provider in ["openai", "gemini", "deepseek"]:  # Handle both OpenAI and Gemini with OpenAI client
                 response = await self._call_openai(system_prompt, user_prompt, screenshot_data)
             elif self.llm_provider == "anthropic":
                 response = await self._call_anthropic(system_prompt, user_prompt, screenshot_data)
